@@ -1,0 +1,56 @@
+#!/bin/bash
+#$ -V             # Pass environment variables to the job
+#$ -N nanoplot    # Replace with a more specific job name
+#$ -cwd           # Use the current working dir		 
+#$ -pe smp 12     # Parallel Environment (how many cores)
+#$ -l h_vmem=4G   # Memory (RAM) allocation *per core*   
+
+USAGE="$(basename "$0") [-h] -o|--output <outdir> -f|--fastq <*.fastq(.gz)>" 
+
+if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
+then 
+  echo "${USAGE}"
+  exit 0
+fi
+
+OUTPUT=""
+FASTQ=()
+POSITIONAL=()
+
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+  
+  case $key in
+    -o|--output)
+    # Directory to write NanoPlot output
+    OUTPUT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -f|--fastq)
+    # One or more fastq(.gz) files to analyze
+    shift
+    while (( "$#" >= 1 )) && ! [[ $2 = --* ]]; do
+      echo "$2"
+      FASTQ+=("$2")
+      shift
+    done
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+  esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+echo OUTPUT  = "${OUTPUT}"
+echo FASTQ   = "${FASTQ[@]}"
+echo POSITIONAL = "${@}"
+
+# Activate a conda environment if necessary
+source /opt/miniconda2/bin/activate nanoplot
+
+# Run NanoStat
+NanoPlot -t 12 --plots dot hex --outdir "${OUTPUT}" --fastq "${FASTQ[@]}"

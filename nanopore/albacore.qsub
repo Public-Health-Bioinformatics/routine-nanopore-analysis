@@ -1,0 +1,60 @@
+#!/bin/bash
+#$ -V             # Pass environment variables to the job
+#$ -N albacore    # Replace with a more specific job name
+#$ -cwd           # Use the current working dir		 
+#$ -pe smp 8     # Parallel Environment (how many cores)
+#$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
+
+USAGE="qsub -t 1:<num_fast5_batch_dirs> $(basename "$0") [-h] [-c config] -i|--input <inputdir> -o|--output <outputdir>" 
+
+if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
+then 
+  echo "${USAGE}"
+  exit 0
+fi
+
+INPUT=""
+OUTPUT=""
+CONFIG="r95_450bps_linear.cfg"
+POSITIONAL=()
+BARCODING=""
+
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+  
+  case $key in
+    -o|--output)
+    # Directory to write NanoStat output
+    OUTPUT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -i|--input)
+    # One or more fastq(.gz) files to analyze
+    INPUT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -c|--config)
+    CONFIG="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+  esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+echo INPUT  = "${INPUT}"
+echo OUTPUT  = "${OUTPUT}"
+echo POSITIONAL = "${@}"
+
+# Activate a conda environment if necessary
+source /opt/miniconda2/bin/activate nanopore
+
+# Run albacore
+read_fast5_basecaller.py --disable_pings -c "${CONFIG}" -t 8 -o fastq -i "${INPUT}"/fast5/$(("${SGE_TASK_ID}" - 1)) -s "${OUTPUT}"/fastq/$(("${SGE_TASK_ID}" - 1)) "${@}"
