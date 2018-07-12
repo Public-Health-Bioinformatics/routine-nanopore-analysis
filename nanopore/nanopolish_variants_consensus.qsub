@@ -68,9 +68,10 @@ set -- "${POSITIONAL[@]}" # restore positional parameters
 
 echo READS = "${READS}"
 echo BAM = "${BAM}"
+echo WINDOW = "${WINDOW}"
 echo GENOME = "${GENOME}"
 echo CONSENSUS = "${CONSENSUS}"
-echo WINDOW = "${WINDOW}"
+echo VARIANTS = "${VARIANTS"
 echo POSITIONAL = "${@}"
 
 # Activate a conda environment if necessary
