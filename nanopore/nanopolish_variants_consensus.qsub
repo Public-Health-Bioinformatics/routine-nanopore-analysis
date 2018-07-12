@@ -71,7 +71,7 @@ echo BAM = "${BAM}"
 echo WINDOW = "${WINDOW}"
 echo GENOME = "${GENOME}"
 echo CONSENSUS = "${CONSENSUS}"
-echo VARIANTS = "${VARIANTS"
+echo VARIANTS = "${VARIANTS}"
 echo POSITIONAL = "${@}"
 
 # Activate a conda environment if necessary
