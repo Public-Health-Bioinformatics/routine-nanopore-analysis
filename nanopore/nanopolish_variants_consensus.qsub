@@ -5,7 +5,7 @@
 #$ -pe smp 8       # Parallel Environment (how many cores)
 #$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
 
-USAGE="qsub $(basename "$0") [-h] -r|--reads READS -b|--bam BAM -c|--consensus CONSENSUS -g|--genome REFERENCE -v|--vcf VARIANTS" 
+USAGE="qsub $(basename "$0") [-h] -r|--reads READS -b|--bam BAM -c|--consensus CONSENSUS -v|--vcf VARIANTS -g|--genome REFERENCE -w|--window WINDOW" 
 
 if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
 then 
@@ -40,15 +40,21 @@ do
     shift # past argument
     shift # past value
     ;;
+    -v|--vcf)
+    # Output variants in .vcf format
+    VARIANTS="$2"
+    shift # past argument
+    shift # past value
+    ;;
     -g|--genome)
     # Reference genome in .fa format
     GENOME="$2"
     shift # past argument
     shift # past value
     ;;
-    -v|--vcf)
+    -w|--window)
     # Output variants in .vcf format
-    VARIANTS="$2"
+    WINDOW="$2"
     shift # past argument
     shift # past value
     ;;
@@ -64,10 +70,11 @@ echo READS = "${READS}"
 echo BAM = "${BAM}"
 echo GENOME = "${GENOME}"
 echo CONSENSUS = "${CONSENSUS}"
+echo WINDOW = "${WINDOW}"
 echo POSITIONAL = "${@}"
 
 # Activate a conda environment if necessary
 source /opt/miniconda2/bin/activate nanopore
 
 # Run program
-nanopolish variants -t 8 --reads "${READS}" --bam "${BAM}" --genome "${GENOME}" --consensus "${CONSENSUS}" "${@}" > "${VARIANTS}"
+nanopolish variants -t 8 --reads "${READS}" --bam "${BAM}" --genome "${GENOME}" --consensus "${CONSENSUS}" "${@}" --window "${WINDOW}" > "${VARIANTS}"
