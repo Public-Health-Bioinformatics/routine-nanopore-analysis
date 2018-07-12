@@ -57,4 +57,4 @@ echo POSITIONAL = "${@}"
 source /opt/miniconda2/bin/activate nanopore
 
 # Run albacore
-read_fast5_basecaller.py --disable_pings -c "${CONFIG}" -t 8 -o fastq -i "${INPUT}"/fast5/$(("${SGE_TASK_ID}" - 1)) -s "${OUTPUT}"/fastq/$(("${SGE_TASK_ID}" - 1)) "${@}"
+read_fast5_basecaller.py --disable_pings -c "${CONFIG}" -t 8 -o fastq -i "${INPUT}"/fast5/$(($SGE_TASK_ID - 1)) -s "${OUTPUT}"/fastq/$(($SGE_TASK_ID - 1)) "${@}"

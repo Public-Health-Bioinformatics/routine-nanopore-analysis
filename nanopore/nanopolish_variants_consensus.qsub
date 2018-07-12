@@ -1,0 +1,73 @@
+#!/bin/bash
+#$ -V               # Pass environment variables to the job
+#$ -N nanopolish
+#$ -cwd             # Use the current working dir		 
+#$ -pe smp 8       # Parallel Environment (how many cores)
+#$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
+
+USAGE="qsub $(basename "$0") [-h] -r|--reads READS -b|--bam BAM -c|--consensus CONSENSUS -g|--genome REFERENCE -v|--vcf VARIANTS" 
+
+if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
+then 
+  echo "${USAGE}"
+  exit 0
+fi
+
+INPUT=""
+OUTPUT=""
+POSITIONAL=()
+
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+  
+  case $key in
+    -r|--reads)
+    # Reads in .fastq format
+    READS="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -b|--bam)
+    # Alignment in .bam format
+    BAM="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -c|--consensus)
+    # Output consensus in .fa format
+    CONSENSUS="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -g|--genome)
+    # Reference genome in .fa format
+    GENOME="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -v|--vcf)
+    # Output variants in .vcf format
+    VARIANTS="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+  esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+echo READS = "${READS}"
+echo BAM = "${BAM}"
+echo GENOME = "${GENOME}"
+echo CONSENSUS = "${CONSENSUS}"
+echo POSITIONAL = "${@}"
+
+# Activate a conda environment if necessary
+source /opt/miniconda2/bin/activate nanopore
+
+# Run program
+nanopolish variants -t 8 --reads "${READS}" --bam "${BAM}" --genome "${GENOME}" --consensus "${CONSENSUS}" "${@}" > "${VARIANTS}"
