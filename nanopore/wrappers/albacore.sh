@@ -76,8 +76,8 @@ fi
 
 # Print some info to stderr for debugging & provenance
 (>&2 echo NUM_FAST5_SUBDIRS   = "${NUM_FAST5_SUBDIRS}" )
-(>&2 echo LOWER_FAST5_DIR_NUM = "${LOWER_FAST5_DIR_NUM}" )
-(>&2 echo UPPER_FAST5_DIR_NUM = "${UPPER_FAST5_DIR_NUM}" )
+(>&2 echo LOWER_FAST5_DIR_NUM = "${LOWER_FAST5_DIR_NUM}" (Default is 0 if unspecified))
+(>&2 echo UPPER_FAST5_DIR_NUM = "${UPPER_FAST5_DIR_NUM}" (Default is -1 if unspecified and all dirs will be basecalled))
 (>&2 echo CONFIG              = "${CONFIG}" )
 (>&2 echo BARCODING           = "${BARCODING}" )
 (>&2 echo ALBACORE_VERSION    = "${ALBACORE_VERSION}" )
