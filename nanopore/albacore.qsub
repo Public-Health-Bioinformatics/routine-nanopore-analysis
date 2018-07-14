@@ -5,9 +5,9 @@
 #$ -pe smp 8     # Parallel Environment (how many cores)
 #$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
 
-USAGE="qsub -t 1:<num_fast5_batch_dirs> $(basename "$0") [-h] [-c config] [-b|--barcoding] -i|--input <inputdir> -o|--output <outputdir>"
+USAGE="qsub -t 1:<num_fast5_batch_dirs> $(basename "$0") [-h] [-c config] [-b|--barcoding] -i|--input <inputdir> -o|--output <outputdir>\nNOTE: Default config is 'r94_450bps_linear.cfg"
 
-if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
+if [[ ( $1 == "--help") ||  $1 == "-h" ]];
 then 
   echo "${USAGE}"
   exit 0
@@ -25,13 +25,13 @@ do
   
   case $key in
     -o|--output)
-    # Directory to write NanoStat output
+    # Directory to write output
     OUTPUT="$2"
     shift # past argument
     shift # past value
     ;;
     -i|--input)
-    # One or more fastq(.gz) files to analyze
+    # Base directory for run (must contain a 'fast5' subdir)
     INPUT="$2"
     shift # past argument
     shift # past value
@@ -65,4 +65,4 @@ source /opt/miniconda2/bin/activate nanopore
 
 # Run albacore
 read_fast5_basecaller.py --disable_pings -c "${CONFIG}" -t 8 -o fastq -i "${INPUT}"/fast5/$(($SGE_TASK_ID - 1)) -s "${OUTPUT}"/fastq/$(($SGE_TASK_ID - 1)) \
-  if ["${BARCODING}"=true]; then --barcoding; fi "${@}"
+  `if ["${BARCODING}"=true]; then echo "--barcoding"; fi` "${@}"
