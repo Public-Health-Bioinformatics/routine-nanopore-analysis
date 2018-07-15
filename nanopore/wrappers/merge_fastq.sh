@@ -3,7 +3,7 @@ set -euo pipefail
 IFS=$'\n\t'
 
 # Constants
-declare -r MERGE_FASTQ_QSUB_SCRIPT="/home/dfornika/code/qsub-scripts/nanopore/merge_fastq.qsub" # replace when we decide on a system-wid install location
+declare -r MERGE_FASTQ_QSUB_SCRIPT="/home/dfornika/code/qsub-scripts/nanopore/merge_fastq.qsub" # replace when we decide on a system-wide install location
 
 # Defaults
 BARCODING=false
