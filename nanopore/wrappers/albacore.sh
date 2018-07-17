@@ -83,5 +83,5 @@ fi
 (>&2 echo ALBACORE_VERSION    = "${ALBACORE_VERSION}" )
 
 # Submit qsub job
-qsub -t $(( $LOWER_FAST5_DIR_NUM + 1 )):$( if [[ "${UPPER_FAST5_DIR_NUM}" = -1 ]]; then echo $NUM_FAST5_SUBDIRS; else echo $(( $UPPER_FAST5_DIR_NUM + 1 )); fi ) "${ALBACORE_QSUB_SCRIPT}" -c "${CONFIG}" -i "${INPUT}" -o "${OUTPUT_BASE_DIR}"/$( basename "$INPUT" )/albacore-"${ALBACORE_VERSION}"_$( cut -d '.' -f1 <<< "${CONFIG}" ) $( if [[ "${BARCODING}" = true ]]; then echo "--barcoding"; fi )
+qsub -t $(( $LOWER_FAST5_DIR_NUM + 1 )):$( if [[ "${UPPER_FAST5_DIR_NUM}" = -1 ]]; then echo $NUM_FAST5_SUBDIRS; else echo $(( $UPPER_FAST5_DIR_NUM + 1 )); fi ) "${ALBACORE_QSUB_SCRIPT}" -c "${CONFIG}" -i "${INPUT}" -o "${OUTPUT_BASE_DIR}"/$( basename "$INPUT" )/albacore-"${ALBACORE_VERSION}"_$( cut -d '.' -f1 <<< "${CONFIG}" ) $( if [ "$BARCODING" = true ]; then echo "--barcoding"; fi )
 
