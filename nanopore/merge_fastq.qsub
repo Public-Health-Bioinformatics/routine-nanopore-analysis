@@ -61,6 +61,6 @@ then
 else
   for BARCODE_ID in $( ls "${INPUT}/fastq/0/workspace/"${PASS_FAIL}" ) 
   do
-    cat "${INPUT}"/fastq/*/workspace/"${PASS_FAIL}"/"${BARCODE_ID}"/*.fastq | bgzip > "${INPUT}"/$( basename ${INPUT}/."${PASS_FAIL}"."${BARCODE_ID}".merged.fastq.gz 
+    cat "${INPUT}"/fastq/*/workspace/"${PASS_FAIL}"/"${BARCODE_ID}"/*.fastq | bgzip > "${INPUT}"/$( basename ${INPUT} )."${PASS_FAIL}"."${BARCODE_ID}".merged.fastq.gz 
   done
 fi
