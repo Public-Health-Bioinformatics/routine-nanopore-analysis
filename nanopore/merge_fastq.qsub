@@ -55,6 +55,9 @@ echo BARCODE_ID  = "${BARCODE_ID}"
 # Activate a conda environment if necessary
 source /opt/miniconda2/bin/activate nanopore
 
+# Prepare output directory
+mkdir -p "${INPUT}"/merged/"${PASS_FAIL}"
+
 # Run program
-cat "${INPUT}"/fastq/*/workspace/"${PASS_FAIL}"/"${BARCODE_ID}"/*.fastq | bgzip > "${INPUT}"/merged/$( basename $( dirname "${INPUT}" ) )$( if [ -n "$BARCODE_ID" ]; then echo _"${BARCODE_ID}"; fi )."${PASS_FAIL}".merged.fastq.gz
+cat "${INPUT}"/fastq/*/workspace/"${PASS_FAIL}"/"${BARCODE_ID}"/*.fastq | bgzip > "${INPUT}"/merged/"${PASS_FAIL}"/$( basename $( dirname "${INPUT}" ) )$( if [ -n "$BARCODE_ID" ]; then echo _"${BARCODE_ID}"; fi )."${PASS_FAIL}".merged.fastq.gz
 

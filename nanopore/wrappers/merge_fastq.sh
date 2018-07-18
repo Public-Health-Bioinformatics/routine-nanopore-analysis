@@ -7,6 +7,7 @@ declare -r MERGE_FASTQ_QSUB_SCRIPT="/home/dfornika/code/qsub-scripts/nanopore/me
 
 # Defaults
 BARCODING=false
+BARCODE_IDS=()
 
 USAGE=$'$(basename "$0") [-h] [-b|--barcoding] -i|--input <inputdir>'
 
@@ -39,17 +40,22 @@ do
   esac
 done
 
-mkdir -p "${INPUT}"/merged
+# Enumerate all barcode IDs 
+for FASTQ_SUBDIR in $( ls -1 "${INPUT}/fastq" ); do
+    for BARCODE_ID in $( ls -1 "${INPUT}"/fastq/"${FASTQ_SUBDIR}"/workspace/pass; ls -1 "${INPUT}"/fastq/"${FASTQ_SUBDIR}"/workspace/fail ); do
+	if [[ ! " ${BARCODE_IDS[@]-} " =~ " ${BARCODE_ID} " ]]; then
+	    BARCODE_IDS+=("${BARCODE_ID}")
+	fi
+    done
+done
 
 if [ "$BARCODING" = false ]; then
-  qsub "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --pass
+  qsub "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --pass;
   qsub "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --fail
 elif [ "$BARCODING" = true ]; then
-  for BARCODE_ID in $( ls -1 "${INPUT}"/fastq/0/workspace/pass ); do
-    qsub "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --pass
-  done
-  for BARCODE_ID in $( ls -1 "${INPUT}"/fastq/0/workspace/fail ); do
-    qsub "{$MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --fail
+  for BARCODE_ID in "${BARCODE_IDS[@]}"; do
+      qsub "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --pass;
+      qsub "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --fail
   done
 fi
 
