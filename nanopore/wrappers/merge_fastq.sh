@@ -39,15 +39,17 @@ do
   esac
 done
 
+mkdir -p "${INPUT}"/merged
+
 if [ "$BARCODING" = false ]; then
-  qsub MERGE_FASTQ_QSUB_SCRIPT "${INPUT}" --pass
-  qsub MERGE_FASTQ_QSUB_SCRIPT "${INPUT}" --fail
+  qsub "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --pass
+  qsub "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --fail
 elif [ "$BARCODING" = true ]; then
   for BARCODE_ID in $( ls -1 "${INPUT}"/fastq/0/workspace/pass ); do
-    qsub MERGE_FASTQ_QSUB_SCRIPT "${INPUT}" --barcode_id "${BARCODE_ID}" --pass
+    qsub "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --pass
   done
-  for BARCODE_ID in $( ls -1 "${INPUT}"/0/workspace/fail ); do
-    qsub MERGE_FASTQ_QSUB_SCRIPT "${INPUT}" --barcode_id "${BARCODE_ID}" --fail
+  for BARCODE_ID in $( ls -1 "${INPUT}"/fastq/0/workspace/fail ); do
+    qsub "{$MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --fail
   done
 fi
 
