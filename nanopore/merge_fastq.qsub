@@ -5,7 +5,7 @@
 #$ -pe smp 1      # Parallel Environment (how many cores)
 #$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
 
-USAGE="qsub $(basename "$0") [-h] -i|--input (-p|--pass | -f|--fail) [-b|--barcoding]" 
+USAGE="qsub $(basename "$0") [-h] -i|--input (-p|--pass | -f|--fail) [-b|--barcode_id]" 
 
 if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
 then 
@@ -15,7 +15,7 @@ fi
 
 INPUT=""
 PASS_FAIL=""
-BARCODING=false
+BARCODE_ID=""
 
 while [[ $# -gt 0 ]]
 do
@@ -38,29 +38,23 @@ do
     PASS_FAIL="fail"
     shift # past argument
     ;;
-    -b|--barcoding)
+    -b|--barcode_id)
     # Run is barcoded
-    BARCODING=true
+    BARCODE_ID="$2"
     shift # past argument
+    shift # past value
     ;;
     *)    # unknown option
   esac
 done
 
-echo INPUT      = "${INPUT}"
-echo PASS_FAIL  = "${PASS_FAIL}"
-echo BARCODING  = "${BARCODING}"
+echo INPUT       = "${INPUT}"
+echo PASS_FAIL   = "${PASS_FAIL}"
+echo BARCODE_ID  = "${BARCODE_ID}"
 
 # Activate a conda environment if necessary
 # source /opt/miniconda2/bin/activate nanopore
 
 # Run program
-if [$BARCODING=false];
-then
-  cat "${INPUT}"/fastq/*/workspace/"${PASS_FAIL}"/*.fastq | bgzip > "${INPUT}"/$( basename ${INPUT} )."${PASS_FAIL}".merged.fastq.gz
-else
-  for BARCODE_ID in $( ls "${INPUT}/fastq/0/workspace/"${PASS_FAIL}" ) 
-  do
-    cat "${INPUT}"/fastq/*/workspace/"${PASS_FAIL}"/"${BARCODE_ID}"/*.fastq | bgzip > "${INPUT}"/$( basename ${INPUT} )."${PASS_FAIL}"."${BARCODE_ID}".merged.fastq.gz 
-  done
-fi
+cat "${INPUT}"/fastq/*/workspace/"${PASS_FAIL}"/"${BARCODE_ID}"/*.fastq | bgzip > "${INPUT}"/merged/$( basename ${INPUT} )_"${BARCODE_ID}"."${PASS_FAIL}".merged.fastq.gz
+
