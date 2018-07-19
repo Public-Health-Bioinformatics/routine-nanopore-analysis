@@ -23,16 +23,17 @@ do
   
   case $key in
     -5|--fast5)
-    # Input directory
+    # fast5 directory
     FAST5="$2"
     shift # past argument
     shift # past value
     ;;
     -q|--fastq)
-    # Output directory
+    # The merged fastq file to index
     FASTQ="$2"
     shift # past argument
     shift # past value
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -47,4 +48,4 @@ echo FASTQ  = "${FASTQ}"
 source /opt/miniconda2/bin/activate nanopore
 
 # Run program
-nanopolish index -d "${FAST5}" -f <(ls -1 $( dirname $( dirname $( dirname "${FASTQ}" ) ) )/fastq/*/sequencing_summary.txt) "${FASTQ}"
+ls -1 $( dirname $( dirname $( dirname "${FASTQ}" ) ) )/fastq/*/sequencing_summary.txt | nanopolish index -d "${FAST5}" -f /dev/stdin "${FASTQ}"
