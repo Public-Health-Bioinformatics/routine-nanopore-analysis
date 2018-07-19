@@ -1,11 +1,11 @@
 #!/bin/bash
 #$ -V             # Pass environment variables to the job
-#$ -N <name>      # Replace with a more specific job name
+#$ -N np_index
 #$ -cwd           # Use the current working dir		 
 #$ -pe smp 8      # Parallel Environment (how many cores)
 #$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
 
-USAGE="qsub $(basename "$0") [-h] [-o|--optional optional_arg] -r|--required required_arg" 
+USAGE="qsub $(basename "$0") [-h] -5|--fast5 FAST5_DIR -q|--fastq FASTQ" 
 
 if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
 then 
@@ -13,8 +13,8 @@ then
   exit 0
 fi
 
-INPUT=""
-OUTPUT=""
+FAST5=""
+FASTQ=""
 POSITIONAL=()
 
 while [[ $# -gt 0 ]]
@@ -22,15 +22,15 @@ do
   key="$1"
   
   case $key in
-    -i|--input)
+    -5|--fast5)
     # Input directory
-    INPUT="$2"
+    FAST5="$2"
     shift # past argument
     shift # past value
     ;;
-    -o|--output)
+    -q|--fastq)
     # Output directory
-    OUTPUT="$2"
+    FASTQ="$2"
     shift # past argument
     shift # past value
     *)    # unknown option
@@ -39,14 +39,12 @@ do
     ;;
   esac
 done
-set -- "${POSITIONAL[@]}" # restore positional parameters
 
-echo INPUT  = "${INPUT}"
-echo OUTPUT  = "${OUTPUT}"
-echo POSITIONAL = "${@}"
+echo FAST5  = "${FAST5}"
+echo FASTQ  = "${FASTQ}"
 
 # Activate a conda environment if necessary
-# source /opt/miniconda2/bin/activate env
+source /opt/miniconda2/bin/activate nanopore
 
 # Run program
-program -o "${OUTPUT}" -i "${INPUT}" "${@}"
+nanopolish index -d "${FAST5}" -f <(ls -1 $( dirname $( dirname $( dirname "${FASTQ}" ) ) )/fastq/*/sequencing_summary.txt) "${FASTQ}"
