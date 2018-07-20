@@ -4,6 +4,8 @@ IFS=$'\n\t'
 
 # Constants
 declare -r MERGE_FASTQ_QSUB_SCRIPT="/home/dfornika/code/qsub-scripts/nanopore/merge_fastq.qsub" # replace when we decide on a system-wide install location
+declare -r QSUB_ERROR_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )/merge_fastq"
+declare -r QSUB_OUTPUT_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )/merge_fastq"
 
 # Defaults
 BARCODING=false
@@ -40,9 +42,17 @@ do
   esac
 done
 
+(>&2 echo BARCODING = "${BARCODING}")
+(>&2 echo QSUB_ERROR_LOG_DIR  = "${QSUB_ERROR_LOG_DIR}" )
+(>&2 echo QSUB_OUTPUT_LOG_DIR = "${QSUB_OUTPUT_LOG_DIR}" )
+
+# Prepare log dirs
+mkdir -p "${QSUB_ERROR_LOG_DIR}"
+mkdir -p "${QSUB_OUTPUT_LOG_DIR}"
+
 if [ "$BARCODING" = false ]; then
-  qsub "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --pass;
-  qsub "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --fail
+  qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --pass;
+  qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --fail
 elif [ "$BARCODING" = true ]; then
     # Enumerate all barcode IDs 
     for FASTQ_SUBDIR in $( ls -1 "${INPUT}/fastq" ); do
@@ -55,8 +65,8 @@ elif [ "$BARCODING" = true ]; then
 
     # Submit qsub jobs
     for BARCODE_ID in "${BARCODE_IDS[@]}"; do
-	qsub "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --pass;
-	qsub "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --fail
+	qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --pass;
+	qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --fail
     done
 fi
 

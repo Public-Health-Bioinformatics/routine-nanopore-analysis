@@ -11,8 +11,8 @@ declare -r ALBACORE_QSUB_SCRIPT="/home/dfornika/code/qsub-scripts/nanopore/albac
 declare -r OUTPUT_BASE_DIR="/data/minion/basecalls"
 declare -r ALBACORE_SCRIPT="/opt/miniconda2/envs/nanopore/bin/read_fast5_basecaller.py"
 ALBACORE_VERSION=$( "${ALBACORE_SCRIPT}" --version | cut -d "(" -f2 | cut -d ")" -f1 | cut -d' ' -f2)
-declare -r QSUB_ERROR_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )"
-declare -r QSUB_OUTPUT_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )"
+declare -r QSUB_ERROR_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )/albacore"
+declare -r QSUB_OUTPUT_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )/albacore"
 
 # Defaults
 CONFIG="r94_450bps_linear.cfg"
