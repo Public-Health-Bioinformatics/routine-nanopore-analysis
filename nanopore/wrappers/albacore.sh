@@ -11,6 +11,8 @@ declare -r ALBACORE_QSUB_SCRIPT="/home/dfornika/code/qsub-scripts/nanopore/albac
 declare -r OUTPUT_BASE_DIR="/data/minion/basecalls"
 declare -r ALBACORE_SCRIPT="/opt/miniconda2/envs/nanopore/bin/read_fast5_basecaller.py"
 ALBACORE_VERSION=$( "${ALBACORE_SCRIPT}" --version | cut -d "(" -f2 | cut -d ")" -f1 | cut -d' ' -f2)
+declare -r QSUB_ERROR_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )"
+declare -r QSUB_OUTPUT_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )"
 
 # Defaults
 CONFIG="r94_450bps_linear.cfg"
@@ -81,7 +83,13 @@ fi
 (>&2 echo CONFIG              = "${CONFIG}" )
 (>&2 echo BARCODING           = "${BARCODING}" )
 (>&2 echo ALBACORE_VERSION    = "${ALBACORE_VERSION}" )
+(>&2 echo QSUB_ERROR_LOG_DIR  = "${QSUB_ERROR_LOG_DIR}" )
+(>&2 echo QSUB_OUTPUT_LOG_DIR = "${QSUB_OUTPUT_LOG_DIR}" )
+
+# Prepare log dirs
+mkdir -p "${QSUB_ERROR_LOG_DIR}"
+mkdir -p "${QSUB_OUTPUT_LOG_DIR}"
 
 # Submit qsub job
-qsub -t $(( $LOWER_FAST5_DIR_NUM + 1 )):$( if [[ "${UPPER_FAST5_DIR_NUM}" = -1 ]]; then echo $NUM_FAST5_SUBDIRS; else echo $(( $UPPER_FAST5_DIR_NUM + 1 )); fi ) "${ALBACORE_QSUB_SCRIPT}" -c "${CONFIG}" -i "${INPUT}" -o "${OUTPUT_BASE_DIR}"/$( basename "$INPUT" )/albacore-"${ALBACORE_VERSION}"_$( cut -d '.' -f1 <<< "${CONFIG}" ) $( if [ "$BARCODING" = true ]; then echo "--barcoding"; fi )
+qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" -t $(( $LOWER_FAST5_DIR_NUM + 1 )):$( if [[ "${UPPER_FAST5_DIR_NUM}" = -1 ]]; then echo $NUM_FAST5_SUBDIRS; else echo $(( $UPPER_FAST5_DIR_NUM + 1 )); fi ) "${ALBACORE_QSUB_SCRIPT}" -c "${CONFIG}" -i "${INPUT}" -o "${OUTPUT_BASE_DIR}"/$( basename "$INPUT" )/albacore-"${ALBACORE_VERSION}"_$( cut -d '.' -f1 <<< "${CONFIG}" ) $( if [ "$BARCODING" = true ]; then echo "--barcoding"; fi )
 
