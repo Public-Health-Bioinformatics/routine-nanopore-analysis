@@ -11,11 +11,11 @@ declare -r QSUB_OUTPUT_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8
 BARCODING=false
 BARCODE_IDS=()
 
-USAGE=$'$(basename "$0") [-h] [-b|--barcoding] -i|--input <inputdir>'
+USAGE="$( basename $BASH_SOURCE )  [-h] [-b|--barcoding] -i|--input <inputdir>"
 
 if [[ $# -eq 0 || $1 == "--help" ||  $1 == "-h" ]] 
 then 
-  echo "${USAGE}"
+  echo "Usage: ${USAGE}"
   exit 0
 fi
 
