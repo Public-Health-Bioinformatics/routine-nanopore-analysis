@@ -78,7 +78,7 @@ fi
 
 # Parse timestamp from directory and prepare parent directory with no timestamp (date only)
 # Multiple run re-starts will be collected inside the same parent dir
-# YYMMDD_sample_libraryprep/YYMMDD_TIME_sample_libraryprep
+# YYYYMMDD_sample_libraryprep/YYYYMMDD_TIME_sample_libraryprep
 INPUT_BASENAME=$( basename "${INPUT}" )
 TIMESTAMP=${INPUT_BASENAME:9:4}
 INPUT_BASENAME_NO_TIMESTAMP=${INPUT_BASENAME/_"${TIMESTAMP}"_/_}
