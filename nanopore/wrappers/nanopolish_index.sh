@@ -4,6 +4,8 @@ IFS=$'\n\t'
 
 # Constants
 declare -r NANOPOLISH_INDEX_QSUB_SCRIPT="/home/dfornika/code/qsub-scripts/nanopore/nanopolish_index.qsub" # replace when we decide on a system-wide install location
+declare -r QSUB_ERROR_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )/nanopolish_index"
+declare -r QSUB_OUTPUT_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )/nanopolish_index"
 
 USAGE=$'$(basename "$0") [-h] -5|--fast5 FAST5_DIR -q|--fastq MERGED_FASTQ_DIR'
 
@@ -33,9 +35,19 @@ do
   esac
 done
 
+(>&2 echo FAST5_DIR  = "${FAST5_DIR}" )
+(>&2 echo FASTQ_DIR  = "${FASTQ_DIR}" )
+(>&2 echo QSUB_ERROR_LOG_DIR  = "${QSUB_ERROR_LOG_DIR}" )
+(>&2 echo QSUB_OUTPUT_LOG_DIR = "${QSUB_OUTPUT_LOG_DIR}" )
+
+# Prepare log dirs
+mkdir -p "${QSUB_ERROR_LOG_DIR}"
+mkdir -p "${QSUB_OUTPUT_LOG_DIR}"
+
+
 # Submit qsub jobs
 for FASTQ in $( find "${FASTQ_DIR}" -type f ); do
-    qsub "${NANOPOLISH_INDEX_QSUB_SCRIPT}" --fast5 "${FAST5_DIR}"/fast5 --fastq "${FASTQ}"
+    qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${NANOPOLISH_INDEX_QSUB_SCRIPT}" --fast5 "${FAST5_DIR}"/fast5 --fastq "${FASTQ}"
 done
 
 
