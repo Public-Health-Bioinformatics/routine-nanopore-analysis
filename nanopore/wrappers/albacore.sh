@@ -20,12 +20,13 @@ BARCODING=false
 LOWER_FAST5_DIR_NUM=0
 UPPER_FAST5_DIR_NUM=-1
 
-USAGE=$'$(basename "$0") [-h] [-c config] [-b|--barcoding] [-l|--lower_fast5_dir_num] [-u|--upper_fast5_dir_num] -i|--input <inputdir>\nNOTE: Default config is: r94_450bps_linear.cfg'
+USAGE="$( basename $BASH_SOURCE ) [-h] [-c config] [-b|--barcoding] [-l|--lower_fast5_dir_num] [-u|--upper_fast5_dir_num] -i|--input <inputdir>"
 
 if [[ $# -eq 0 || $1 == "--help" ||  $1 == "-h" ]] 
 then 
-  echo "${USAGE}"
-  exit 0
+    echo "Usage: ${USAGE}"
+    echo "NOTE: Default config is: ${CONFIG}"
+    exit 0
 fi
 
 
