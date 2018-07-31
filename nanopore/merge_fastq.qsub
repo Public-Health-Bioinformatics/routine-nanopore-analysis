@@ -5,7 +5,7 @@
 #$ -pe smp 1      # Parallel Environment (how many cores)
 #$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
 
-USAGE="qsub $(basename "$0") [-h] (-p|--pass | -f|--fail) [-b|--barcode_id] [-l|--lower_fastq_dir_num] [-u|--upper_fastq_dir_num] -i|--input" 
+USAGE="qsub $(basename "$0") [-h] (-p|--pass | -f|--fail) [-b|--barcode_id] -l|--lower_fastq_dir_num -u|--upper_fastq_dir_num -i|--input" 
 
 if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
 then 
@@ -16,8 +16,6 @@ fi
 INPUT=""
 PASS_FAIL=""
 BARCODE_ID=""
-LOWER_FASTQ_DIR_NUM=0
-UPPER_FASTQ_DIR_NUM=-1
 
 while [[ $# -gt 0 ]]
 do
@@ -62,29 +60,24 @@ done
 
 NUM_FASTQ_SUBDIRS=$( ls -1 "$INPUT"/fastq | wc -l )
 
-if [[ "${UPPER_FASTQ_DIR_NUM:-}" > -1 && "${LOWER_FASTQ_DIR_NUM}" > "${UPPER_FASTQ_DIR_NUM}" ]];
+if [[ "${LOWER_FASTQ_DIR_NUM}" > "${UPPER_FASTQ_DIR_NUM}" ]];
 then
     echo "ERROR: Upper fastq dir must be greater than or equal to Lower fastq dir."
     exit 1
 fi
 
-if [[ "${UPPER_FASTQ_DIR_NUM:-}" == -1 && "${LOWER_FASTQ_DIR_NUM}" == 0 ]];
+if [[ "${LOWER_FASTQ_DIR_NUM}" == 0 && "${UPPER_FASTQ_DIR_NUM}" == $(( $NUM_FASTQ_SUBDIRS - 1 )) ]];
 then
     MERGED_SUBDIR="all"
 else
     MERGED_SUBDIR="${LOWER_FASTQ_DIR_NUM}"-"${UPPER_FASTQ_DIR_NUM}"
 fi
 
-if [[ "${UPPER_FASTQ_DIR_NUM:-}" == -1 ]];
-then
-    UPPER_FASTQ_DIR_NUM="${NUM_FASTQ_SUBDIRS}" - 1
-fi
-
 echo INPUT       = "${INPUT}"
 echo PASS_FAIL   = "${PASS_FAIL}"
 echo BARCODE_ID  = "${BARCODE_ID}"
-echo LOWER_FASTQ_DIR_NUM = "${LOWER_FASTQ_DIR_NUM}" "(Default is 0 if unspecified)"
-echo UPPER_FASTQ_DIR_NUM = "${UPPER_FASTQ_DIR_NUM}" "(Default is -1 if unspecified and upper limit will be auto-detected)"
+echo LOWER_FASTQ_DIR_NUM = "${LOWER_FASTQ_DIR_NUM}"
+echo UPPER_FASTQ_DIR_NUM = "${UPPER_FASTQ_DIR_NUM}"
 
 # Activate a conda environment if necessary
 source /opt/miniconda2/bin/activate nanopore

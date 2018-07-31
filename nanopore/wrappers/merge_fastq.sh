@@ -54,6 +54,19 @@ do
   esac
 done
 
+if [[ "${UPPER_FASTQ_DIR_NUM:-}" > -1 && "${LOWER_FASTQ_DIR_NUM}" > "${UPPER_FASTQ_DIR_NUM}" ]];
+then
+    echo "ERROR: Upper fastq dir must be greater than or equal to Lower fastq dir."
+    exit 1
+fi
+
+NUM_FASTQ_SUBDIRS=$( ls -1 "$INPUT"/fastq | wc -l )
+
+if [[ "${UPPER_FASTQ_DIR_NUM:-}" == -1 ]];
+then
+    UPPER_FASTQ_DIR_NUM=$(( $NUM_FASTQ_SUBDIRS - 1 ))
+fi
+
 (>&2 echo BARCODING = "${BARCODING}")
 (>&2 echo LOWER_FASTQ_DIR_NUM  = "${LOWER_FASTQ_DIR_NUM}" )
 (>&2 echo UPPER_FASTQ_DIR_NUM  = "${UPPER_FASTQ_DIR_NUM}" )
