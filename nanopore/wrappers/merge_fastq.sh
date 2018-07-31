@@ -10,8 +10,10 @@ declare -r QSUB_OUTPUT_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8
 # Defaults
 BARCODING=false
 BARCODE_IDS=()
+LOWER_FASTQ_DIR_NUM=0
+UPPER_FASTQ_DIR_NUM=-1
 
-USAGE="$( basename $BASH_SOURCE )  [-h] [-b|--barcoding] -i|--input <inputdir>"
+USAGE="$( basename $BASH_SOURCE )  [-h] [-b|--barcoding] [-l|--lower_fastq_dir_num] [-u|--upper_fastq_dir_num] -i|--input <inputdir>"
 
 if [[ $# -eq 0 || $1 == "--help" ||  $1 == "-h" ]] 
 then 
@@ -35,6 +37,16 @@ do
     BARCODING=true
     shift # past argument
     ;;
+    -l|--lower_fastq_dir_num)
+    LOWER_FASTQ_DIR_NUM="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -u|--upper_fastq_dir_num)
+    UPPER_FASTQ_DIR_NUM="$2"
+    shift # past argument
+    shift # past value
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1")
     shift # past argument
@@ -43,6 +55,8 @@ do
 done
 
 (>&2 echo BARCODING = "${BARCODING}")
+(>&2 echo LOWER_FASTQ_DIR_NUM  = "${LOWER_FASTQ_DIR_NUM}" )
+(>&2 echo UPPER_FASTQ_DIR_NUM  = "${UPPER_FASTQ_DIR_NUM}" )
 (>&2 echo QSUB_ERROR_LOG_DIR  = "${QSUB_ERROR_LOG_DIR}" )
 (>&2 echo QSUB_OUTPUT_LOG_DIR = "${QSUB_OUTPUT_LOG_DIR}" )
 
@@ -51,8 +65,8 @@ mkdir -p "${QSUB_ERROR_LOG_DIR}"
 mkdir -p "${QSUB_OUTPUT_LOG_DIR}"
 
 if [ "$BARCODING" = false ]; then
-  qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --pass;
-  qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" --fail
+  qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" -l "${LOWER_FASTQ_DIR_NUM}" -u "${UPPER_FASTQ_DIR_NUM}" --pass;
+  qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" -l "${LOWER_FASTQ_DIR_NUM}" -u "${UPPER_FASTQ_DIR_NUM}" --fail
 elif [ "$BARCODING" = true ]; then
     # Enumerate all barcode IDs 
     for FASTQ_SUBDIR in $( ls -1 "${INPUT}/fastq" ); do
@@ -65,8 +79,8 @@ elif [ "$BARCODING" = true ]; then
 
     # Submit qsub jobs
     for BARCODE_ID in "${BARCODE_IDS[@]}"; do
-	qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --pass;
-	qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" --fail
+	qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" -l "${LOWER_FASTQ_DIR_NUM}" -u "${UPPER_FASTQ_DIR_NUM}" --pass;
+	qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" --barcode_id "$BARCODE_ID" -l "${LOWER_FASTQ_DIR_NUM}" -u "${UPPER_FASTQ_DIR_NUM}" --fail
     done
 fi
 
