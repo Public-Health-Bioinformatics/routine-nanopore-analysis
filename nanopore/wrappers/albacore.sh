@@ -77,13 +77,13 @@ then
     exit 1
 fi
 
-# Parse timestamp from directory and prepare parent directory with no timestamp (date only)
+# Prepare parent directory with no timestamp (date only)
 # Multiple run re-starts will be collected inside the same parent dir
 # YYYYMMDD_sample_libraryprep/YYYYMMDD_TIME_sample_libraryprep
 INPUT_BASENAME=$( basename "${INPUT}" )
-TIMESTAMP=${INPUT_BASENAME:9:4}
-INPUT_BASENAME_NO_TIMESTAMP=${INPUT_BASENAME/_"${TIMESTAMP}"_/_}
-mkdir -p "${OUTPUT_BASE_DIR}"/"${INPUT_BASENAME_NO_TIMESTAMP}"
+INPUT_PARENT_BASENAME=$( basename $( dirname "${INPUT}" ) )
+
+mkdir -p "${OUTPUT_BASE_DIR}"/"${INPUT_PARENT_BASENAME}"
 
 # Prepare log dirs
 mkdir -p "${QSUB_ERROR_LOG_DIR}"
@@ -92,8 +92,7 @@ mkdir -p "${QSUB_OUTPUT_LOG_DIR}"
 # Print some info to stderr for debugging & provenance
 (>&2 echo INPUT               = "${INPUT}" )
 (>&2 echo INPUT_BASENAME      = "${INPUT_BASENAME}" )
-(>&2 echo TIMESTAMP           = "${TIMESTAMP}" )
-(>&2 echo INPUT_BASENAME_NO_TIMESTAMP  = "${INPUT_BASENAME_NO_TIMESTAMP}" )
+(>&2 echo INPUT_PARENT_BASENAME = "${INPUT_PARENT_BASENAME}" )
 (>&2 echo NUM_FAST5_SUBDIRS   = "${NUM_FAST5_SUBDIRS}" )
 (>&2 echo LOWER_FAST5_DIR_NUM = "${LOWER_FAST5_DIR_NUM}" "(Default is 0 if unspecified)")
 (>&2 echo UPPER_FAST5_DIR_NUM = "${UPPER_FAST5_DIR_NUM}" "(Default is -1 if unspecified and upper limit will be auto-detected)")
@@ -104,5 +103,5 @@ mkdir -p "${QSUB_OUTPUT_LOG_DIR}"
 (>&2 echo QSUB_OUTPUT_LOG_DIR = "${QSUB_OUTPUT_LOG_DIR}" )
 
 # Submit qsub job
-qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" -t $(( $LOWER_FAST5_DIR_NUM + 1 )):$( if [[ "${UPPER_FAST5_DIR_NUM}" = -1 ]]; then echo $NUM_FAST5_SUBDIRS; else echo $(( $UPPER_FAST5_DIR_NUM + 1 )); fi ) "${ALBACORE_QSUB_SCRIPT}" -c "${CONFIG}" -i "${INPUT}" -o "${OUTPUT_BASE_DIR}"/"${INPUT_BASENAME_NO_TIMESTAMP}"/"${INPUT_BASENAME}"/albacore-"${ALBACORE_VERSION}"_$( cut -d '.' -f1 <<< "${CONFIG}" ) $( if [ "$BARCODING" = true ]; then echo "--barcoding"; fi )
+qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" -t $(( $LOWER_FAST5_DIR_NUM + 1 )):$( if [[ "${UPPER_FAST5_DIR_NUM}" = -1 ]]; then echo $NUM_FAST5_SUBDIRS; else echo $(( $UPPER_FAST5_DIR_NUM + 1 )); fi ) "${ALBACORE_QSUB_SCRIPT}" -c "${CONFIG}" -i "${INPUT}" -o "${OUTPUT_BASE_DIR}"/"${INPUT_PARENT_BASENAME}"/"${INPUT_BASENAME}"/albacore-"${ALBACORE_VERSION}"_$( cut -d '.' -f1 <<< "${CONFIG}" ) $( if [ "$BARCODING" = true ]; then echo "--barcoding"; fi )
 
