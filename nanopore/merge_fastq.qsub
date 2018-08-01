@@ -80,11 +80,11 @@ echo LOWER_FASTQ_DIR_NUM = "${LOWER_FASTQ_DIR_NUM}"
 echo UPPER_FASTQ_DIR_NUM = "${UPPER_FASTQ_DIR_NUM}"
 
 # Activate a conda environment if necessary
-source /opt/miniconda2/bin/activate nanopore
+# source /opt/miniconda2/bin/activate nanopore
 
 # Prepare output directory
 mkdir -p "${INPUT}"/merged/"${MERGED_SUBDIR}"/"${PASS_FAIL}"
 
 # Run program
-eval cat "${INPUT}"/fastq/{"${LOWER_FASTQ_DIR_NUM}".."${UPPER_FASTQ_DIR_NUM}"}/workspace/"${PASS_FAIL}"/"${BARCODE_ID}"/*.fastq | bgzip > "${INPUT}"/merged/"${MERGED_SUBDIR}"/"${PASS_FAIL}"/$( basename $( dirname "${INPUT}" ) )$( if [ -n "$BARCODE_ID" ]; then echo _"${BARCODE_ID}"; fi )."${PASS_FAIL}".merged.fastq.gz
+eval cat "${INPUT}"/fastq/{"${LOWER_FASTQ_DIR_NUM}".."${UPPER_FASTQ_DIR_NUM}"}/workspace/"${PASS_FAIL}"/"${BARCODE_ID}"/*.fastq | gzip > "${INPUT}"/merged/"${MERGED_SUBDIR}"/"${PASS_FAIL}"/$( basename $( dirname "${INPUT}" ) )$( if [ -n "$BARCODE_ID" ]; then echo _"${BARCODE_ID}"; fi )."${PASS_FAIL}".merged.fastq.gz
 
