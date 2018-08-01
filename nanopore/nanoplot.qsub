@@ -1,11 +1,11 @@
 #!/bin/bash
 #$ -V             # Pass environment variables to the job
-#$ -N nanoplot    # Replace with a more specific job name
+#$ -N nanoplot    
 #$ -cwd           # Use the current working dir		 
 #$ -pe smp 12     # Parallel Environment (how many cores)
-#$ -l h_vmem=4G   # Memory (RAM) allocation *per core*   
+#$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
 
-USAGE="$(basename "$0") [-h] -o|--output <outdir> -f|--fastq <*.fastq(.gz)>" 
+USAGE="$( basename $BASH_SOURCE ) [-h] -o|--output <outdir> -f|--fastq <*.fastq(.gz)>" 
 
 if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
 then 
@@ -30,7 +30,6 @@ do
     ;;
     -f|--fastq)
     # One or more fastq(.gz) files to analyze
-    shift
     while (( "$#" >= 1 )) && ! [[ $2 = --* ]]; do
       echo "$2"
       FASTQ+=("$2")
@@ -45,12 +44,16 @@ do
 done
 set -- "${POSITIONAL[@]}" # restore positional parameters
 
+# The last element of FASTQ is '' so we need to remove it
+unset 'FASTQ[${#FASTQ[@]}-1]'
+
 echo OUTPUT  = "${OUTPUT}"
 echo FASTQ   = "${FASTQ[@]}"
+echo NUM_FASTQ_FILES = "${#FASTQ[@]}"
 echo POSITIONAL = "${@}"
 
 # Activate a conda environment if necessary
 source /opt/miniconda2/bin/activate nanoplot
 
 # Run NanoStat
-NanoPlot -t 12 --plots dot hex --outdir "${OUTPUT}" --fastq "${FASTQ[@]}"
+NanoPlot -t 12 --plots kde --outdir "${OUTPUT}" --fastq_rich "${FASTQ[@]}"
