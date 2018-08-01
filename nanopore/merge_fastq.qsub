@@ -62,7 +62,7 @@ NUM_FASTQ_SUBDIRS=$( ls -1 "$INPUT"/fastq | wc -l )
 
 if [[ "${LOWER_FASTQ_DIR_NUM}" > "${UPPER_FASTQ_DIR_NUM}" ]];
 then
-    echo "ERROR: Upper fastq dir must be greater than or equal to Lower fastq dir."
+    (>&2 echo "ERROR: Upper fastq dir must be greater than or equal to Lower fastq dir." )
     exit 1
 fi
 

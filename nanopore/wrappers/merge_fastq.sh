@@ -78,8 +78,8 @@ mkdir -p "${QSUB_ERROR_LOG_DIR}"
 mkdir -p "${QSUB_OUTPUT_LOG_DIR}"
 
 if [ "$BARCODING" = false ]; then
-  qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" -l "${LOWER_FASTQ_DIR_NUM}" -u "${UPPER_FASTQ_DIR_NUM}" --pass;
-  qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" "${INPUT}" -l "${LOWER_FASTQ_DIR_NUM}" -u "${UPPER_FASTQ_DIR_NUM}" --fail
+  qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" -l "${LOWER_FASTQ_DIR_NUM}" -u "${UPPER_FASTQ_DIR_NUM}" --pass;
+  qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${MERGE_FASTQ_QSUB_SCRIPT}" -i "${INPUT}" -l "${LOWER_FASTQ_DIR_NUM}" -u "${UPPER_FASTQ_DIR_NUM}" --fail
 elif [ "$BARCODING" = true ]; then
     # Enumerate all barcode IDs 
     for FASTQ_SUBDIR in $( ls -1 "${INPUT}/fastq" ); do
