@@ -7,12 +7,11 @@ declare -r PORECHOP_QSUB_SCRIPT="/home/dfornika/code/qsub-scripts/nanopore/porec
 declare -r QSUB_ERROR_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )/porechop"
 declare -r QSUB_OUTPUT_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )/porechop"
 
-USAGE="$( basename $BASH_SOURCE ) [-h] [-c config] -i|--input <inputdir>"
+USAGE="$( basename $BASH_SOURCE ) [-h] -i|--input <inputdir>"
 
 if [[ $# -eq 0 || $1 == "--help" ||  $1 == "-h" ]] 
 then 
     echo "Usage: ${USAGE}"
-    echo "NOTE: Default config is: ${CONFIG}"
     exit 0
 fi
 
