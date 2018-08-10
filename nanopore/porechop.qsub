@@ -1,0 +1,53 @@
+#!/bin/bash
+#$ -V             # Pass environment variables to the job
+#$ -N porechop
+#$ -cwd           # Use the current working dir		 
+#$ -pe smp 8      # Parallel Environment (how many cores)
+#$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
+
+USAGE="qsub $( basename "$BASH_SOURCE" ) [-h] -i|--input input.fastq.gz -o|--output output.fastq.gz" 
+
+if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
+then 
+  echo "${USAGE}"
+  exit 0
+fi
+
+INPUT=""
+OUTPUT=""
+POSITIONAL=()
+
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+  
+  case $key in
+    -i|--input)
+    # Input fastq.gz file
+    INPUT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -o|--output)
+    # Output fastq.gz file
+    OUTPUT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+  esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+echo INPUT  = "${INPUT}"
+echo OUTPUT  = "${OUTPUT}"
+echo POSITIONAL = "${@}"
+
+# Activate a conda environment if necessary
+source /opt/miniconda2/bin/activate nanopore
+
+# Run program
+porechop -t 8 -i "${INPUT}" -o "${OUTPUT}"
