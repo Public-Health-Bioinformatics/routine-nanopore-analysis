@@ -1,0 +1,66 @@
+#!/bin/bash
+#$ -V             # Pass environment variables to the job
+#$ -N blastn
+#$ -cwd           # Use the current working dir
+#$ -pe smp 12     # Parallel Environment (how many cores)
+#$ -l h_vmem=2G   # Memory (RAM) allocation *per core*
+
+set +o posix
+
+USAGE="qsub $( basename "$BASH_SOURCE" ) [-h] -i|--input INPUT_FASTQ_GZ -d|--db DATABASE -o|--output OUTPUT" 
+
+if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
+then 
+  echo "${USAGE}"
+  exit 0
+fi
+
+INPUT=""
+OUTPUT=""
+POSITIONAL=()
+
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+  
+  case $key in
+    -i|--input)
+    # Input fastq.gz file
+    INPUT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -d|--db)
+    # blast database
+    DATABASE="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -o|--output)
+    # Output blast result tsv file
+    OUTPUT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    *)    # unknown option
+    POSITIONAL+=("$1") # save it in an array for later
+    shift # past argument
+    ;;
+  esac
+done
+set -- "${POSITIONAL[@]}" # restore positional parameters
+
+echo INPUT      = "${INPUT}"
+echo DATABASE   = "${DATABASE}"
+echo OUTPUT     = "${OUTPUT}"
+echo POSITIONAL = "${@}"
+
+# Activate a conda environment if necessary
+source /opt/miniconda2/bin/activate blast
+
+# Run program
+export BLASTDB=$( dirname "${DATABASE}" )
+OUTFMT="6 qseqid sseqid length qstart qend sstrand sstart send qcovs pident evalue bitscore sacc staxid ssciname stitle"
+echo "${OUTFMT:2}" | tr ' ' '\t' > "${OUTPUT}"
+blastn -db "${DATABASE}" -max_target_seqs 1 -max_hsps 1 -query <(zcat "${INPUT}" | sed -n '1~4s/^@/>/p;2~4p') \
+       -outfmt "${OUTFMT}" >> "${OUTPUT}"
