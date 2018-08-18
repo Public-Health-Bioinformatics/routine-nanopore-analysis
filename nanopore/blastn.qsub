@@ -7,11 +7,14 @@
 
 set +o posix
 
-USAGE="qsub $( basename "$BASH_SOURCE" ) [-h] -i|--input INPUT_FASTQ_GZ -d|--db DATABASE -o|--output OUTPUT" 
+USAGE="qsub $( basename "$BASH_SOURCE" ) [-h] -i|--input INPUT_FASTQ_GZ -d|--db DATABASE -o|--output OUTPUT\n\
+\n\
+optional arguments:\n\
+  -h, --help \t\t\t Show this help message and exit" 
 
 if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
 then 
-  echo "${USAGE}"
+  echo -e "Usage: ${USAGE}"
   exit 0
 fi
 
