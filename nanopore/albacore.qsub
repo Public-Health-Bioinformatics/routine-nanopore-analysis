@@ -1,15 +1,22 @@
+
 #!/bin/bash
 #$ -V             # Pass environment variables to the job
-#$ -N albacore    # Replace with a more specific job name
+#$ -N albacore
 #$ -cwd           # Use the current working dir		 
-#$ -pe smp 8     # Parallel Environment (how many cores)
+#$ -pe smp 8      # Parallel Environment (how many cores)
 #$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
 
-USAGE="qsub -t 1:<num_fast5_batch_dirs> $(basename "$0") [-h] [-c config] [-b|--barcoding] -i|--input <inputdir> -o|--output <outputdir>\nNOTE: Default config is 'r94_450bps_linear.cfg"
+USAGE="qsub -t 1:<num_fast5_batch_dirs> $(basename "$0") [-h] [-c config] [-b|--barcoding] -i|--input INPUT_DIR -o|--output OUTPUT_DIR\n\
+\n\
+optional arguments:\n\
+  -h, --help \t\t\t Show this help message and exit\n\
+  -c CONFIG, --config CONFIG\t Albacore config file (Default: 'r94_450bps_linear.cfg')\n\
+  -b, --barcoding \t\t Search for barcodes to demultiplex sequencing data.\n\
+"
 
 if [[ ( $1 == "--help") ||  $1 == "-h" ]];
 then 
-  echo "${USAGE}"
+  echo -e "Usage: ${USAGE}"
   exit 0
 fi
 
@@ -60,8 +67,7 @@ echo CONFIG     = "${CONFIG}"
 echo BARCODING  = "${BARCODING}"
 echo POSITIONAL = "${@}"
 
-# Activate a conda environment if necessary
-source /opt/miniconda2/bin/activate nanopore
+source /opt/miniconda2/bin/activate albacore
 
 # Run albacore
-read_fast5_basecaller.py --disable_pings -c "${CONFIG}" -t 8 -o fastq -i "${INPUT}"/fast5/$(($SGE_TASK_ID - 1)) -s "${OUTPUT}"/fastq/$(($SGE_TASK_ID - 1)) $( if [ "$BARCODING" = true ]; then echo "--barcoding"; fi ) "${@}"
+read_fast5_basecaller.py --disable_pings --resume -c "${CONFIG}" -t 8 -o fastq -i "${INPUT}"/fast5/$(($SGE_TASK_ID - 1)) -s "${OUTPUT}"/fastq/$(($SGE_TASK_ID - 1)) $( if [ "$BARCODING" = true ]; then echo "--barcoding"; fi ) "${@}"
