@@ -1,0 +1,73 @@
+#!/bin/bash
+#$ -V             # Pass environment variables to the job
+#$ -N seqsum-merge    
+#$ -cwd           # Use the current working dir		 
+#$ -pe smp 1      # Parallel Environment (how many cores)
+#$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
+
+USAGE="qsub $(basename "$0") [-h] [-l|--lower_fastq_dir_num] [-u|--upper_fastq_dir_num] -i|--input\n\
+\n\
+optional arguments:\n\
+  -h, --help \t\t\t Show this help message and exit\n\
+  -l, --lower_fastq_dir_num \t Lowest directory number to include in merge\n\
+  -u, --upper_fastq_dir_num \t Highest directory number to include in merge"
+
+if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
+then 
+  echo -e "Usage: ${USAGE}"
+  exit 0
+fi
+
+INPUT=""
+PASS_FAIL=""
+BARCODE_ID=""
+
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+  
+  case $key in
+    -i|--input)
+    # Input directory
+    INPUT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -l|--lower_fastq_dir_num)
+    LOWER_FASTQ_DIR_NUM="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    -u|--upper_fastq_dir_num)
+    UPPER_FASTQ_DIR_NUM="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    *)    # unknown option
+  esac
+done
+
+NUM_FASTQ_SUBDIRS=$( ls -1 "$INPUT"/fastq | wc -l )
+
+if [[ "${LOWER_FASTQ_DIR_NUM}" > "${UPPER_FASTQ_DIR_NUM}" ]];
+then
+    (>&2 echo "ERROR: Upper fastq dir must be greater than or equal to Lower fastq dir." )
+    exit 1
+fi
+
+if [[ "${LOWER_FASTQ_DIR_NUM}" == 0 && "${UPPER_FASTQ_DIR_NUM}" == $(( $NUM_FASTQ_SUBDIRS - 1 )) ]];
+then
+    MERGED_SUBDIR="all"
+else
+    MERGED_SUBDIR="${LOWER_FASTQ_DIR_NUM}"-"${UPPER_FASTQ_DIR_NUM}"
+fi
+
+echo INPUT       = "${INPUT}"
+echo LOWER_FASTQ_DIR_NUM = "${LOWER_FASTQ_DIR_NUM}"
+echo UPPER_FASTQ_DIR_NUM = "${UPPER_FASTQ_DIR_NUM}"
+
+# Prepare output directory
+mkdir -p "${INPUT}"/merged/"${MERGED_SUBDIR}"
+
+# Run program
+eval cat "${INPUT}"/fastq/{"${LOWER_FASTQ_DIR_NUM}".."${UPPER_FASTQ_DIR_NUM}"}/sequencing_summary.txt > "${INPUT}"/merged/"${MERGED_SUBDIR}"/sequencing_summary.txt
