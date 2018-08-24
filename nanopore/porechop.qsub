@@ -5,7 +5,7 @@
 #$ -pe smp 8      # Parallel Environment (how many cores)
 #$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
 
-USAGE="qsub $( basename "$BASH_SOURCE" ) [-h] -i|--input input.fastq.gz -o|--output output.fastq.gz" 
+USAGE="qsub $( basename "$BASH_SOURCE" ) [-h] -i|--input INPUT -o|--output OUTPUT" 
 
 if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
 then 

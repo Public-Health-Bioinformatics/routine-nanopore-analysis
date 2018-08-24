@@ -45,6 +45,6 @@ mkdir -p "${QSUB_OUTPUT_LOG_DIR}"
 # Submit qsub job
 for FASTQ in "${INPUT}"/*.fastq.gz; do
     FASTQ_BASENAME=$( basename "${FASTQ}" )
-    qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${PORECHOP_QSUB_SCRIPT}" -i "${FASTQ}" -o "${INPUT}"/"${FASTQ_BASENAME%.fastq.gz}".porechop.fastq.gz
+    qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${PORECHOP_QSUB_SCRIPT}" -i "${FASTQ}" -o "${INPUT}"/"${FASTQ_BASENAME%.fastq.gz}".trim.fastq.gz
 done
 
