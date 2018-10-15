@@ -34,4 +34,4 @@ conda create -n mash-2.0 mash=2.0
 
 ### Edit the `config.conf` file
 
-A [config.conf]() file is used to customize these scripts to a specific system. Review that file and fill in appropriate values for those settings before running these scripts.
+A [config.conf](config.conf) file is used to customize these scripts to a specific system. Review that file and fill in appropriate values for those settings before running these scripts.
