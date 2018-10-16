@@ -11,7 +11,7 @@ declare -i lower_fast5_dir_num
 declare -i upper_fast5_dir_num
 
 # Constants
-declare -r albacore_qsub_script="${routine_nanopore_analysis_repo_root_dir}"/albacore.qsub
+declare -r albacore_qsub_script="${routine_nanopore_processing_repo_root_dir}"/qsub_scripts/albacore.qsub
 declare -r output_base_dir="${minion_data_base_dir}"/basecalls
 declare -r albacore_script="${conda_envs_dir}"/albacore-"${albacore_version}"/bin/read_fast5_basecaller.py
 reported_albacore_version=$( "${albacore_script}" --version | cut -d "(" -f2 | cut -d ")" -f1 | cut -d' ' -f2)
