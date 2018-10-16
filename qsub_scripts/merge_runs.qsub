@@ -1,0 +1,49 @@
+#!/bin/bash
+#$ -V             # Pass environment variables to the job
+#$ -N fq-merge    
+#$ -cwd           # Use the current working dir		 
+#$ -pe smp 1      # Parallel Environment (how many cores)
+#$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
+
+USAGE="qsub $(basename "$0") [-h] [-b|--barcode_id] -i|--input" 
+
+if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
+then 
+  echo "${USAGE}"
+  exit 0
+fi
+
+INPUT=""
+PASS_FAIL=""
+BARCODE_ID=""
+
+while [[ $# -gt 0 ]]
+do
+  key="$1"
+  
+  case $key in
+    -i|--input)
+    # Input directory
+    INPUT="$2"
+    shift # past argument
+    shift # past value
+    ;;
+    *)    # unknown option
+  esac
+done
+
+echo INPUT       = "${INPUT}"
+echo PASS_FAIL   = "${PASS_FAIL}"
+echo BARCODE_ID  = "${BARCODE_ID}"
+echo LOWER_FASTQ_DIR_NUM = "${LOWER_FASTQ_DIR_NUM}"
+echo UPPER_FASTQ_DIR_NUM = "${UPPER_FASTQ_DIR_NUM}"
+
+# Activate a conda environment if necessary
+# source /opt/miniconda2/bin/activate nanopore
+
+# Prepare output directory
+mkdir -p "${INPUT}"/merged/"${MERGED_SUBDIR}"/"${PASS_FAIL}"
+
+# Run program
+eval cat "${INPUT}"/fastq/{"${LOWER_FASTQ_DIR_NUM}".."${UPPER_FASTQ_DIR_NUM}"}/workspace/"${PASS_FAIL}"/"${BARCODE_ID}"/*.fastq | gzip > "${INPUT}"/merged/"${MERGED_SUBDIR}"/"${PASS_FAIL}"/$( basename $( dirname "${INPUT}" ) )$( if [ -n "$BARCODE_ID" ]; then echo _"${BARCODE_ID}"; fi )."${PASS_FAIL}".merged.fastq.gz
+
