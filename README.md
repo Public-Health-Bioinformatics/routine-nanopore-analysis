@@ -1,4 +1,4 @@
-# routine-nanopore-analysis
+# routine-nanopore-processing
 
 A set of scripts to support routine processing of Oxford Nanopore MinION sequence data on a Sun GridEngine-based HPC cluster.
 
