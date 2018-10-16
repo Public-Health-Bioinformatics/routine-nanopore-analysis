@@ -1,9 +1,11 @@
 #!/bin/bash
 #$ -V             # Pass environment variables to the job
-#$ -N fq-merge    
+#$ -N run-merge    
 #$ -cwd           # Use the current working dir		 
 #$ -pe smp 1      # Parallel Environment (how many cores)
 #$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
+
+script_dir=`dirname "$(readlink -f "$0")"`
 
 USAGE="qsub $(basename "$0") [-h] [-b|--barcode_id] -i|--input" 
 
@@ -32,18 +34,10 @@ do
   esac
 done
 
-echo INPUT       = "${INPUT}"
-echo PASS_FAIL   = "${PASS_FAIL}"
-echo BARCODE_ID  = "${BARCODE_ID}"
-echo LOWER_FASTQ_DIR_NUM = "${LOWER_FASTQ_DIR_NUM}"
-echo UPPER_FASTQ_DIR_NUM = "${UPPER_FASTQ_DIR_NUM}"
-
-# Activate a conda environment if necessary
-# source /opt/miniconda2/bin/activate nanopore
-
-# Prepare output directory
-mkdir -p "${INPUT}"/merged/"${MERGED_SUBDIR}"/"${PASS_FAIL}"
+echo "[" `date --iso-8601=ns --utc` "]" "{ \"input_directory\":" "${input_dir}" "}"
+echo "[" `date --iso-8601=ns --utc` "]" "{ \"output_directory\":" "${output_dir}" "}"
+echo "[" `date --iso-8601=ns --utc` "]" "{ \"merged_fastq_filename\":" "${merged_fastq_filename}" "}"
 
 # Run program
-eval cat "${INPUT}"/fastq/{"${LOWER_FASTQ_DIR_NUM}".."${UPPER_FASTQ_DIR_NUM}"}/workspace/"${PASS_FAIL}"/"${BARCODE_ID}"/*.fastq | gzip > "${INPUT}"/merged/"${MERGED_SUBDIR}"/"${PASS_FAIL}"/$( basename $( dirname "${INPUT}" ) )$( if [ -n "$BARCODE_ID" ]; then echo _"${BARCODE_ID}"; fi )."${PASS_FAIL}".merged.fastq.gz
+cat "${fastqs[@]}" > "${output_dir}"/"${merged_fastq_filename}"
 
