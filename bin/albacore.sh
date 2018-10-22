@@ -2,7 +2,8 @@
 set -euo pipefail
 IFS=$'\n\t'
 
-source ../config.conf
+script_dir="$( dirname "$0" )"
+source "${script_dir}"/../config.conf
 
 albacore_version="2.3.1"
 

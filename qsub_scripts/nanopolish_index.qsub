@@ -5,7 +5,9 @@
 #$ -pe smp 8      # Parallel Environment (how many cores)
 #$ -l h_vmem=2G   # Memory (RAM) allocation *per core*   
 
-USAGE="qsub $(basename "$0") [-h] -5|--fast5 FAST5_DIR -q|--fastq FASTQ" 
+USAGE="qsub $(basename "$0") [-h] -5|--fast5 FAST5_DIR -q|--fastq FASTQ -s|--sequencing_summary SEQUENCING_SUMMARY" 
+
+nanopolish_version="0.10.2"
 
 if [[ ( $1 == "--help") ||  $1 == "-h" ]] 
 then 
@@ -13,9 +15,9 @@ then
   exit 0
 fi
 
-FAST5=""
-FASTQ=""
-POSITIONAL=()
+fast5=""
+fastq=""
+sequencing_summary=""
 
 while [[ $# -gt 0 ]]
 do
@@ -23,7 +25,7 @@ do
   
   case $key in
     -5|--fast5)
-    # fast5 directory
+    # Parent directory containing sub-dirs with a fast5 directory
     FAST5="$2"
     shift # past argument
     shift # past value
@@ -34,6 +36,12 @@ do
     shift # past argument
     shift # past value
     ;;
+    -s|--sequencing_summary)
+    # The merged sequencing_summary.txt file
+    sequencing_summary="$2"
+    shift # past argument
+    shift # past value
+    ;;
     *)    # unknown option
     POSITIONAL+=("$1") # save it in an array for later
     shift # past argument
@@ -41,11 +49,12 @@ do
   esac
 done
 
-echo FAST5  = "${FAST5}"
-echo FASTQ  = "${FASTQ}"
+echo "{ \"sequencing_summary\": "${sequencing_summary}" }"
+echo "{ \"fast5\": "${fast5}" }"
+echo "{ \"fastq\": "${fastq}" }"
 
 # Activate a conda environment if necessary
-source /opt/miniconda2/bin/activate nanopore
+source /opt/miniconda2/bin/activate nanopolish-"${nanopolish_version}"
 
 # Run program
-ls -1 $( dirname $( dirname $( dirname "${FASTQ}" ) ) )/fastq/*/sequencing_summary.txt | nanopolish index -d "${FAST5}" -f /dev/stdin "${FASTQ}"
+nanopolish index -s "${sequencing_summary}" -d "${fast5}" "${fastq}"

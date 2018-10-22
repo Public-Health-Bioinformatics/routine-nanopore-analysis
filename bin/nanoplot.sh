@@ -2,8 +2,11 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+script_dir="$( dirname "$0" )"
+source "${script_dir}"/../config.conf
+
 # Constants
-declare -r NANOPLOT_QSUB_SCRIPT="/home/dfornika/code/qsub-scripts/nanopore/nanoplot.qsub" # replace when we decide on a system-wide install location
+declare -r NANOPLOT_QSUB_SCRIPT="${routine_nanopore_processing_repo_root_dir}"/qsub_scripts/nanoplot.qsub
 declare -r OUTPUT_BASE_DIR="/data/minion/quality_control"
 declare -r QSUB_ERROR_LOG_DIR="/data/minion/quality_control/qsub_logs/$( date --iso-8601 )/nanoplot"
 declare -r QSUB_OUTPUT_LOG_DIR="/data/minion/quality_control/qsub_logs/$( date --iso-8601 )/nanoplot"
@@ -35,8 +38,6 @@ do
 done
 
 
-
-
 # Parse timestamp from directory and prepare parent directory with no timestamp (date only)
 # Multiple run re-starts will be collected inside the same parent dir
 # YYYYMMDD_sample_libraryprep/YYYYMMDD_TIME_sample_libraryprep
@@ -61,6 +62,9 @@ mkdir -p "${QSUB_OUTPUT_LOG_DIR}"
 (>&2 echo QSUB_OUTPUT_LOG_DIR = "${QSUB_OUTPUT_LOG_DIR}" )
 
 # Submit qsub job
-qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" "${NANOPLOT_QSUB_SCRIPT}"  -o "${OUTPUT_BASE_DIR}"/"${OUTPUT_PATH}" --fastq "${INPUT}"/*.fastq.gz
+qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" \
+     "${NANOPLOT_QSUB_SCRIPT}" \
+     -o "${OUTPUT_BASE_DIR}"/"${OUTPUT_PATH}" \
+     --fastq "${INPUT}"/*.fastq.gz
 
 

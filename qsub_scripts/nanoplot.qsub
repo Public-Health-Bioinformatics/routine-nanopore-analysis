@@ -56,4 +56,7 @@ echo POSITIONAL = "${@}"
 source /opt/miniconda2/bin/activate nanoplot
 
 # Run NanoStat
-NanoPlot -t 12 --plots kde --outdir "${OUTPUT}" --fastq_rich "${FASTQ[@]}"
+NanoPlot -t 12 \
+	 --plots kde \
+	 --fastq_rich "${FASTQ[@]}" \
+	 --outdir "${OUTPUT}" 

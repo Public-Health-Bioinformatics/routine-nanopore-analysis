@@ -2,8 +2,11 @@
 set -euo pipefail
 IFS=$'\n\t'
 
+script_dir="$( dirname "$0" )"
+source "${script_dir}"/../config.conf
+
 # Constants
-declare -r MERGE_SEQUENCING_SUMMARY_QSUB_SCRIPT="/home/dfornika/code/qsub-scripts/nanopore/merge_sequencing_summary.qsub" # replace when we decide on a system-wide install location
+declare -r MERGE_SEQUENCING_SUMMARY_QSUB_SCRIPT="${routine_nanopore_processing_repo_root_dir}"/qsub_scripts/merge_sequencing_summary.qsub
 declare -r QSUB_ERROR_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )/merge_sequencing_summary"
 declare -r QSUB_OUTPUT_LOG_DIR="/data/minion/basecalls/qsub_logs/$( date --iso-8601 )/merge_sequencing_summary"
 

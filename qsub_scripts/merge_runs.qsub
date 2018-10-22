@@ -25,7 +25,7 @@ do
   
   case $key in
     -i|--input)
-    # Input directory
+    # Input files
     INPUT="$2"
     shift # past argument
     shift # past value
@@ -34,9 +34,11 @@ do
   esac
 done
 
-echo "[" `date --iso-8601=ns --utc` "]" "{ \"input_directory\":" "${input_dir}" "}"
+echo "[" `date --iso-8601=ns --utc` "]" "{ \"input_f\":" "${input_dir}" "}"
 echo "[" `date --iso-8601=ns --utc` "]" "{ \"output_directory\":" "${output_dir}" "}"
 echo "[" `date --iso-8601=ns --utc` "]" "{ \"merged_fastq_filename\":" "${merged_fastq_filename}" "}"
+
+
 
 # Run program
 cat "${fastqs[@]}" > "${output_dir}"/"${merged_fastq_filename}"
