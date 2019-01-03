@@ -55,7 +55,7 @@ echo OUTPUT     = "${OUTPUT}"
 # echo POSITIONAL = "${@}"
 
 # Activate a conda environment if necessary
-source /opt/miniconda2/bin/activate nanopore
+source /opt/miniconda2/bin/activate minimap2
 
 # Run program
-minimap2 -ax "${MODE}" "${REFERENCE}" "${FASTQ}" | samtools sort -@ 7 -O CRAM --reference "${REFERENCE}" -o "${OUTPUT}"
+minimap2 -ax "${MODE}" "${REFERENCE}" "${FASTQ}" | samtools sort -@ 7 --reference "${REFERENCE}" -o "${OUTPUT}"
