@@ -59,7 +59,7 @@ mkdir -p "${QSUB_OUTPUT_LOG_DIR}"
 for FASTQ in $( find "${FASTQ_DIR}" -name '*.fastq.gz'); do
     qsub -o "${QSUB_OUTPUT_LOG_DIR}" -e "${QSUB_ERROR_LOG_DIR}" \
 	 "${NANOPOLISH_INDEX_QSUB_SCRIPT}" \
-	 -d "${FAST5_DIR}" \
+	 --fast5 "${FAST5_DIR}" \
 	 -s "${sequencing_summary}" \
 	 --fastq "${FASTQ}"
 done
